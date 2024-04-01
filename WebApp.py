@@ -9,7 +9,7 @@ st.title("Face Recognition Attendance System")
 # Training Section
 st.header("Training")
 name = st.text_input("Enter Your Name: ")
-num_images = st.number_input("Number of Images to Capture:", min_value=1, step=1, value=100)
+num_images = st.number_input("Number of Images to Capture:", min_value=1, step=10, value=100)
 if st.button("Start Training"):
     train(name, num_images)
     st.success("Training Completed!")
