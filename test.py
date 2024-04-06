@@ -1,5 +1,4 @@
 from sklearn.neighbors import KNeighborsClassifier
-
 import cv2
 import pickle
 import numpy as np
@@ -8,53 +7,48 @@ import csv
 import time
 from datetime import datetime
 
-def test():
-        detector = cv2.CascadeClassifier('data/haarcascade_frontalface_default.xml')
+def test(duration = 5):
+    detector = cv2.CascadeClassifier('data/haarcascade_frontalface_default.xml')
 
-        with open('data/names.pkl', 'rb') as f:
-                classes = pickle.load(f)
+    with open('data/roll_nos.pkl', 'rb') as f:
+        classes = pickle.load(f)
 
-        with open('data/faces_data.pkl', 'rb') as f:
-                faces = pickle.load(f)
+    with open('data/faces_data.pkl', 'rb') as f:
+        faces = pickle.load(f)
 
-        knn = KNeighborsClassifier(n_neighbors=5)
-        knn.fit(faces, classes)
+    knn = KNeighborsClassifier(n_neighbors=5)
+    knn.fit(faces, classes)
 
-        attr = ['Name', 'Date', 'Time']
+    Video = cv2.VideoCapture(0)
+    start_time = time.time()
 
-        while True:
-                Video = cv2.VideoCapture(0)
-                webval,frame = Video.read() #provides 2 values -> webcam value(boolean) and the frame
-                gray_scale = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                Faces = detector.detectMultiScale(gray_scale, 1.3, 4) #width and height of the images
+    while True:
+        webval, frame = Video.read()  
+        if frame is None:
+            break
+        gray_scale = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        faces = detector.detectMultiScale(gray_scale, 1.3, 4) 
 
-                for (x,y,w,h) in Faces:
-                        cropped_image = frame[y:y+h, x:x+w, :]
-                        resized_image = cv2.resize(cropped_image, (50, 50)).flatten().reshape(1, -1)
-                        output = knn.predict(resized_image)
-                        Time = time.time()
-                        date = datetime.fromtimestamp(Time).strftime("%d-%m-%Y")
-                        timestamp = datetime.fromtimestamp(Time).strftime("%H: %M: %S")
-                        isExists = os.path.isfile("Records/Attendance_" + date + ".csv")
-                        cv2.putText(frame, str(output[0]), (x, y-15), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
-                        cv2.rectangle(frame, (x,y), (x+w, y+h), (50, 50, 255), 4)
-                        record = [str(output[0]), str(date), str(timestamp)]
-                cv2.imshow("frame", frame)
-                k = cv2.waitKey(1) #to break the loop
+        for (x, y, w, h) in faces:
+            cropped_image = frame[y:y+h, x:x+w, :]
+            resized_image = cv2.resize(cropped_image, (50, 50)).flatten().reshape(1, -1)
+            output = knn.predict(resized_image)
+            current_time = time.strftime("%H:%M:%S")
+            current_date = time.strftime("%d-%m-%Y")
+            student_label = str(output[0])
 
-                Video.release()
+            attendance_file = f"Records/{student_label}_Attendance.csv"
+            is_exists = os.path.isfile(attendance_file)
 
-                if k == ord('a'):
-                        if isExists:
-                                pass
-                        else:
-                                with open("Records/Attendance_" + date + ".csv", "+a") as sheet:
-                                        wr = csv.writer(sheet)
-                                        wr.writerow(attr)
-                                        wr.writerow(record)
-                        sheet.close()
-                        break
-                if k == ord('e'):
-                        break
+            with open(attendance_file, 'a') as sheet:
+                wr = csv.writer(sheet)
+                if not is_exists:
+                    wr.writerow(['Roll_No', 'Date', 'Time'])
+                wr.writerow([student_label, current_date, current_time])
 
-        cv2.destroyAllWindows()
+        k = cv2.waitKey(1) 
+        if time.time() - start_time >= duration:
+            break
+        Video.release()
+
+    cv2.destroyAllWindows()

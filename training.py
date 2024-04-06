@@ -3,9 +3,9 @@ import pickle
 import numpy as np
 import os
 
-def train(name, n): # n -> number of images
+def train(roll_no, n): 
         
-    print("Training the model for : ", name)
+    print("Training the model for : ", roll_no)
     Video = cv2.VideoCapture(0)
     detector = cv2.CascadeClassifier('data/haarcascade_frontalface_default.xml')
 
@@ -14,9 +14,9 @@ def train(name, n): # n -> number of images
     i = 0
 
     while True:
-        webval,frame = Video.read() #provides 2 values -> webcam value(boolean) and the frame
+        webval,frame = Video.read() 
         gray_scale = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        Faces = detector.detectMultiScale(gray_scale, 1.3, 4) #width and height of the images
+        Faces = detector.detectMultiScale(gray_scale, 1.3, 4) 
 
         for (x,y,w,h) in Faces:
             cropped_image = frame[y:y+h, x:x+w, :]
@@ -28,7 +28,7 @@ def train(name, n): # n -> number of images
             cv2.rectangle(frame, (x,y), (x+w, y+h), (50, 50, 255), 4)
         
         cv2.imshow("frame", frame)
-        k = cv2.waitKey(1) #to break the loop
+        k = cv2.waitKey(1) 
         if k == ord('e') or len(data)==100:
             break
 
@@ -38,16 +38,16 @@ def train(name, n): # n -> number of images
     data = np.asarray(data)
     data = data.reshape(100, -1)
 
-    if 'names.pkl' not in os.listdir('data/'):
-        names = [name]*100
-        with open('data/names.pkl', 'wb') as f:
-            pickle.dump(names, f)
+    if 'roll_nos.pkl' not in os.listdir('data/'):
+        roll_nos = [roll_no]*100
+        with open('data/roll_nos.pkl', 'wb') as f:
+            pickle.dump(roll_nos, f)
     else:
-        with open('data/names.pkl', 'rb') as f:
-            names = pickle.load(f) 
-        names = names + [name]*100
-        with open('data/names.pkl', 'wb') as f:
-            pickle.dump(names, f)
+        with open('data/roll_nos.pkl', 'rb') as f:
+            roll_nos = pickle.load(f) 
+        roll_nos = roll_nos + [roll_no]*100
+        with open('data/roll_nos.pkl', 'wb') as f:
+            pickle.dump(roll_nos, f)
 
     if 'faces_data.pkl' not in os.listdir('data/'):
         with open('data/faces_data.pkl', 'wb') as f:
@@ -57,7 +57,7 @@ def train(name, n): # n -> number of images
             images = pickle.load(f) 
             images = np.append(images, data, axis = 0)
         with open('data/faces_data.pkl', 'wb') as f:
-            pickle.dump(names, f)
+            pickle.dump(roll_nos, f)
 
 
 
