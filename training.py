@@ -55,9 +55,9 @@ def train(roll_no, n):
     else:
         with open('data/faces_data.pkl', 'rb') as f:
             images = pickle.load(f) 
-            images = np.append(images, data, axis = 0)
+            images = np.append(images, data, axis=0)
         with open('data/faces_data.pkl', 'wb') as f:
-            pickle.dump(roll_nos, f)
+            pickle.dump(images, f)  
 
 
 
