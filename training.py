@@ -16,6 +16,9 @@ def train(roll_no, n):
     while True:
         webval,frame = Video.read() 
         gray_scale = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        gray_scale = cv2.equalizeHist(gray_scale)
+        
         Faces = detector.detectMultiScale(gray_scale, 1.3, 4) 
 
         for (x,y,w,h) in Faces:

@@ -27,6 +27,9 @@ def test(duration=2):
         if frame is None:
             break
         gray_scale = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        gray_scale = cv2.equalizeHist(gray_scale)
+
         detected_faces = detector.detectMultiScale(gray_scale, 1.3, 4)
 
         detected_labels = []
@@ -65,5 +68,4 @@ def test(duration=2):
             break
         Video.release()  
         
-    
     cv2.destroyAllWindows()
