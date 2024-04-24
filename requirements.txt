@@ -1,7 +1,6 @@
 scikit-learn
 opencv-python
 opencv-contrib-python
-libgl1
 numpy
 streamlit
 streamlit-autorefresh
