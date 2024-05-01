@@ -67,5 +67,5 @@ def test(duration=2):
         if time.time() - start_time >= duration:
             break
         Video.release()  
-        
+      
     cv2.destroyAllWindows()
